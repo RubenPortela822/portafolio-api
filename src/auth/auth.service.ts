@@ -9,28 +9,28 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
     constructor(
         private readonly usersService: UserService,
-        private readonly jwtService: JwtService,               
+        private readonly jwtService: JwtService,
     ) { }
 
     async register(userDto: RegisterDto) {
         const userEmailCreated = await this.usersService.findByEmail(userDto.email);
         if (userEmailCreated) {
             throw new BadRequestException('Email ya registrado');
-        }  
-        
+        }
+
         const userUsuarioCreated = await this.usersService.findByUsername(userDto.usuario);
         if (userUsuarioCreated) {
             throw new BadRequestException('Usuario ya registrado');
         }
 
-        const {password, ...restUser} = await this.usersService.create(userDto);
+        const { password, ...restUser } = await this.usersService.create(userDto);
         return restUser;
     }
-    
+
     async validateUser(userLogin: LoginDto) {
         const { usuario, password } = userLogin;
-        const user = await this.usersService.findByUsername(usuario);        
-        
+        const user = await this.usersService.findByUsername(usuario);
+
         if (!user) {
             throw new UnauthorizedException('Usuario no encontrado');
         }
@@ -41,7 +41,7 @@ export class AuthService {
         return user;
     }
 
-    
+
     async login(userLogin: LoginDto) {
         const user = await this.validateUser(userLogin);
         const payload = { username: user.usuario, sub: user.id };
@@ -49,5 +49,14 @@ export class AuthService {
             ...userLogin,
             access_token: this.jwtService.sign(payload),
         };
+    }
+
+    async validateUserExist(userName: string) {
+        const user = await this.usersService.findByUsername(userName);
+        if (!user) {
+            throw new UnauthorizedException('Usuario no encontrado');
+        }
+
+        return true;
     }
 }

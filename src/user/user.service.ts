@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from 'src/auth/dto/register.dto';
+import { UserMedia } from 'src/media/entities/user-media.entity';
 
 @Injectable()
 export class UserService {
@@ -44,8 +45,13 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['imagen'],
+    });
+
+    return user ?? null;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -54,5 +60,10 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async assingImage(user, media: UserMedia | null) {
+    user.imagen = media;
+    await this.userRepository.save(user);
   }
 }

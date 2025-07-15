@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Request, } from '@nestjs/common';
 import { MediaService } from './media.service';
-import { CreateMediaDto } from './dto/create-media.dto';
-import { UpdateMediaDto } from './dto/update-media.dto';
+import { JwtGuard } from 'src/auth/jwt/jwt.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
 
 @Controller('media')
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService) { }
 
-  @Post()
-  create(@Body() createMediaDto: CreateMediaDto) {
-    return this.mediaService.create(createMediaDto);
+  @UseGuards(JwtGuard)
+  @Post('user-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/users',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const user = req.user as { userId: number };
+          const filename = `user-${user.userId}-${uniqueSuffix}${ext}`;
+          cb(null, filename);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {
+          return cb(new Error('Solo se permiten imágenes (jpeg, png, webp, gif)'), false);
+        }
+        cb(null, true);
+      }
+    }),
+  )
+  async uploadAvatar(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    const ruta = `uploads/users/${file.filename}`;
+
+    return this.mediaService.saveUserImage(req.user.userId, {
+      nombre: file.originalname,
+      url: ruta,
+      tipo: file.mimetype,
+      peso: file.size.toString(),
+    });
+
   }
 
-  @Get()
-  findAll() {
-    return this.mediaService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mediaService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
-    return this.mediaService.update(+id, updateMediaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mediaService.remove(+id);
-  }
 }

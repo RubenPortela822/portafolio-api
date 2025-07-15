@@ -6,16 +6,16 @@ export class BaseMedia {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({type:"varchar"})    
+    @Column()    
     tipo: string;
 
-    @Column({type:"varchar"})    
+    @Column()    
     nombre: string;
 
-    @Column({type:"varchar"})
+    @Column()
     url: string;
 
     @Column()
-    tamaño: number;
+    peso: string;
 
 }

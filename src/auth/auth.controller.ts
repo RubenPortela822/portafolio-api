@@ -19,8 +19,9 @@ export class AuthController {
     }
 
     @UseGuards(JwtGuard)
-    @Get('perfil')
-    getPerfil(@Request() req) {
+    @Get('profile')
+    async getPerfil(@Request() req) {
+        await this.authService.validateUserExist(req.user.username)
         return {
             mensaje: 'Acceso autorizado',
             usuario: req.user,

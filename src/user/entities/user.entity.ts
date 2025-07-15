@@ -32,7 +32,7 @@ export class User {
     descripcion: string;
     
 
-    @OneToOne(() => UserMedia, (media) => media.usuario,  { cascade: true, onDelete: 'CASCADE' })
+    @OneToOne(() => UserMedia, (media) => media.usuario,  { cascade: false, nullable: true  })
     @JoinColumn()
     imagen: UserMedia;
 
