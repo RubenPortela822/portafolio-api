@@ -31,9 +31,9 @@ export class MediaService {
       }
       const imageId = user.imagen.id;
       await this.usersService.assingImage(user, null);
-      await this.userMediaRepository.delete(imageId );
+      await this.userMediaRepository.delete(imageId);
     }
-    
+
     const media = this.userMediaRepository.create({
       nombre: file.nombre,
       url: file.url,

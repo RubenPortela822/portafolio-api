@@ -8,11 +8,18 @@ import { PostModule } from './post/post.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), DatabaseModule, UserModule, ProjectModule, MediaModule, PostModule, AuthModule],
+  }),
+  ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'uploads'), // Carpeta base
+    serveRoot: '/uploads',     
+  }), DatabaseModule, UserModule, ProjectModule, MediaModule, PostModule, AuthModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

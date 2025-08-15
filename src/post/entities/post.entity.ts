@@ -24,6 +24,9 @@ export class Post {
     @Column({ type: "date" })
     fecha: string;
 
+    @Column({ unique: true })
+    slug: string;
+
     @Column({
         type: "enum",
         enum: ["inactivo", "activo"],

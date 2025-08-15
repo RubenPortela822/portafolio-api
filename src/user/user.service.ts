@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -41,9 +41,6 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
 
   async findOne(id: number) {
     const user = await this.userRepository.findOne({
@@ -54,11 +51,26 @@ export class UserService {
     return user ?? null;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const user = await this.userRepository.preload({
+      id,
+      ...updateUserDto,
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const {password,...rest} = await this.userRepository.save(user);
+    return rest;
   }
 
   remove(id: number) {
+    // #TODO HACER EL ELIMINADO CON LOS PROYECTOS Y BLOGS 
     return `This action removes a #${id} user`;
   }
 

@@ -5,10 +5,6 @@ export class RegisterDto {
     @IsString()
     nombres: string;
 
-    @IsString()
-    @MaxLength(30)
-    apellidos: string;
-
     @IsEmail()
     email:string;
 
