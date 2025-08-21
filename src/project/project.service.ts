@@ -24,14 +24,21 @@ export class ProjectService {
     return await this.projectRepository.save(project);
   }
 
-  findAll() {
-    return `This action returns all project`;
+  async findProjectByUserId(userId: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new BadRequestException('Usuario no encontrado');
+    }
+    const project = await this.projectRepository.find({
+      where: { usuario: user }
+    });
+    return project ?? null;
   }
 
   async findOne(id: number) {
     const project = await this.projectRepository.findOne({
       where: { id },
-      relations: ['usuario'],
+      relations: ['usuario','media'],
     });
     return project ?? null;
   }
@@ -59,4 +66,6 @@ export class ProjectService {
   remove(id: number) {
     return `This action removes a #${id} project`;
   }
+
+  
 }

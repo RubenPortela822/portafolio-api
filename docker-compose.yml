@@ -1,0 +1,25 @@
+version: '3.8'   # Versión del formato docker-compose
+
+services:        # Aquí defines los contenedores (servicios)
+
+  mysql:         # Nombre del servicio (puedes ponerle otro)
+    image: mysql:8              # Imagen de MySQL versión 8
+    container_name: mysql-nest  # Nombre que tendrá el contenedor
+    restart: always             # Si se cae, se reinicia automáticamente
+
+    environment:                # Variables de entorno para configurar MySQL
+      MYSQL_ROOT_PASSWORD: 123456   # Contraseña del usuario root
+      MYSQL_DATABASE: portafolio_db        # Base de datos inicial
+      MYSQL_USER: parca          # Usuario normal
+      MYSQL_PASSWORD: parca123      # Contraseña de ese usuario
+
+    ports:
+      - "3306:3306"  # Exponer el puerto 3306 del contenedor al 3306 de tu máquina
+
+    volumes:         # Volumenes = persistencia de datos
+      - mysql_data:/var/lib/mysql  
+      # Significa: guarda los datos en un volumen de Docker llamado mysql_data
+      # así si borras el contenedor, la DB sigue existiendo
+
+volumes:            # Declaración de volúmenes
+  mysql_data:       # Este volumen es donde se guardan los datos de MySQL

@@ -41,7 +41,7 @@ export class Project {
     })
     estado: statusProject
 
-    @OneToMany(() => ProjectMedia, (media) => media.proyecto)
+    @OneToMany(() => ProjectMedia, (media) => media.proyecto, { cascade: true })
     media: ProjectMedia[];
 
     @ManyToOne(() => User, (usuario) => usuario.proyectos, { eager: true })
@@ -68,7 +68,7 @@ export class Project {
             .replace(/[^a-z0-9\-]/g, '')
             .replace(/-+/g, '-')
             .replace(/^-*/, '')
-            .replace(/-*$/, '') +'-'+ Date.now() + Math.round(Math.random() * 1e9);
+            .replace(/-*$/, '') + '-' + Date.now() + Math.round(Math.random() * 1e9);
     }
 
 }
